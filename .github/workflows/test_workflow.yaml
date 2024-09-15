@@ -17,25 +17,30 @@ jobs:
           java-version: '11'
           continue-on-error: true
 
+      - name: Clean Gradle cache
+        run: |
+          rm -rf $HOME/.gradle/caches/
+        continue-on-error: true
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         continue-on-error: true
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace --info
         continue-on-error: true
 
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test --stacktrace --info
         continue-on-error: true
 
       - name: Generate summary
         run: |
           echo "# Summary" > summary.md
           echo "## Build" >> summary.md
-          ./gradlew build >> summary.md 2>&1 || true
+          ./gradlew build --stacktrace --info >> summary.md 2>&1 || true
           echo "## Tests" >> summary.md
-          ./gradlew test >> summary.md 2>&1 || true
+          ./gradlew test --stacktrace --info >> summary.md 2>&1 || true
 
       - name: Upload summary as artifact
         uses: actions/upload-artifact@v4
