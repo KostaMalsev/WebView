@@ -1,22 +1,16 @@
 name: Build and Test
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Check out repository code
         uses: actions/checkout@v2
-
-      - name: Set up Node.js
+      
+      - name: Set up Node.js environment
         uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -30,21 +24,21 @@ jobs:
         continue-on-error: true
 
       - name: Run tests
-        run: npm test -- --reporter=summary
+        run: npm test
         continue-on-error: true
 
-      - name: Create summary
+      - name: Generate summary
         run: |
-          echo "# Build and Test Summary" > summary.md
+          echo "# Summary" > summary.md
           echo "## Install dependencies" >> summary.md
           npm install >> summary.md 2>&1 || true
-          echo "## Run build" >> summary.md
+          echo "## Build" >> summary.md
           npm run build >> summary.md 2>&1 || true
-          echo "## Run tests" >> summary.md
-          npm test -- --reporter=summary >> summary.md 2>&1 || true
+          echo "## Tests" >> summary.md
+          npm test >> summary.md 2>&1 || true
 
-      - name: Upload summary artifact
-        uses: actions/upload-artifact@v2
+      - name: Upload summary as artifact
+        uses: actions/upload-artifact@v4
         with:
           name: SummaryResult
           path: summary.md
