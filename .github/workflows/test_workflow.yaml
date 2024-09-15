@@ -1,0 +1,50 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+        continue-on-error: true
+
+      - name: Run build
+        run: npm run build
+        continue-on-error: true
+
+      - name: Run tests
+        run: npm test -- --reporter=summary
+        continue-on-error: true
+
+      - name: Create summary
+        run: |
+          echo "# Build and Test Summary" > summary.md
+          echo "## Install dependencies" >> summary.md
+          npm install >> summary.md 2>&1 || true
+          echo "## Run build" >> summary.md
+          npm run build >> summary.md 2>&1 || true
+          echo "## Run tests" >> summary.md
+          npm test -- --reporter=summary >> summary.md 2>&1 || true
+
+      - name: Upload summary artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: SummaryResult
+          path: summary.md
