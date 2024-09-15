@@ -1,5 +1,3 @@
-# GitHub Actions Workflow
-
 name: Build and Test Project
 
 on:
@@ -30,4 +28,17 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build --continue
+
+    - name: Save build result to summary.md
+      run: |
+        echo "# Build Summary" > summary.md
+        echo "## Build Result" >> summary.md
+        ./gradlew build >> summary.md
+        echo "Build step completed" >> summary.md
+    
+    - name: Archive summary.md
+      uses: actions/upload-artifact@v2
+      with:
+        name: SummaryResult
+        path: summary.md
