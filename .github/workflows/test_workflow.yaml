@@ -10,32 +10,32 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       
-      - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
-          node-version: '14'
+          distribution: 'adopt'
+          java-version: '11'
+          continue-on-error: true
 
-      - name: Install dependencies
-        run: npm install
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
         continue-on-error: true
 
-      - name: Run build
-        run: npm run build
+      - name: Build with Gradle
+        run: ./gradlew build
         continue-on-error: true
 
       - name: Run tests
-        run: npm test
+        run: ./gradlew test
         continue-on-error: true
 
       - name: Generate summary
         run: |
           echo "# Summary" > summary.md
-          echo "## Install dependencies" >> summary.md
-          npm install >> summary.md 2>&1 || true
           echo "## Build" >> summary.md
-          npm run build >> summary.md 2>&1 || true
+          ./gradlew build >> summary.md 2>&1 || true
           echo "## Tests" >> summary.md
-          npm test >> summary.md 2>&1 || true
+          ./gradlew test >> summary.md 2>&1 || true
 
       - name: Upload summary as artifact
         uses: actions/upload-artifact@v4
